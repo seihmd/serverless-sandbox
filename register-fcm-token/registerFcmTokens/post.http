@@ -1,0 +1,14 @@
+# This file is http client for jetbrains editor
+
+### Send normal request
+POST http://localhost:4567/restapis/0wnwh5ly0b/local/_user_request_/fcm-tokens
+Content-Type: application/json
+
+# Error will occur when the same token is sent multiple times
+{
+  "token": "test_token",
+  "os": "android",
+  "user_id": "1"
+}
+
+###

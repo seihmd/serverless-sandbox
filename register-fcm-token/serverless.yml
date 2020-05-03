@@ -1,0 +1,74 @@
+service: register-fcm-token-service
+
+frameworkVersion: '>=1.28.0 <2.0.0'
+
+plugins:
+  - serverless-localstack
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  deploymentBucket:
+    name: ${self:service}-${opt:stage}-deployment-bucket
+
+#  iamRoleStatements:
+#    - Effect: "Allow"
+#      Action:
+#        - "s3:CreatePlatformEndpoint"
+#      Resource: ${ssm:/fcm/${self:provider.stage}/sns/arn}
+
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+    host: http://localhost
+    autostart: true
+    endpoints:
+      S3: http://localhost:4572
+      DynamoDB: http://localhost:4569
+      CloudFormation: http://localhost:4581
+      Elasticsearch: http://localhost:4571
+      ES: http://localhost:4578
+      SNS: http://localhost:4575
+      SQS: http://localhost:4576
+      Lambda: http://localhost:4574
+      Kinesis: http://localhost:4568
+  sns_arn:
+    local: arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns
+#    default: ${ssm:/fcm/${self:provider.stage}/sns/arn}
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  registerFcmTokens:
+    handler: bin/registerFcmTokens
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - sns:CreatePlatformEndpoint
+        Resource: 'arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns'
+    events:
+      - http:
+          path: fcm-tokens
+          method: POST
+    environment:
+      ENV_SNS_ARN: arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns
+      ENV_DYNAMO_TABLE: FcmTable #${ssm:/fcm/${self:provider.stage}/dynamodb/table/name}
+# you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
