@@ -38,7 +38,7 @@ local-dynamodb-create-table:
 local-ssm-put-parameter:
 	awslocal ssm put-parameter \
 		--name /fcm/local/sns/arn \
-		--value arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns \
+		--value arn:aws:sns:ap-northeast-1:000000000000:app/GCM/fcm_sns \
 		--type String \
 	&& awslocal ssm put-parameter \
 		--name /fcm/local/dynamodb/table/name \
@@ -46,10 +46,10 @@ local-ssm-put-parameter:
 		--type String
 
 local-deploy: clean build
-	sls deploy --stage local -r us-east-1
+	sls deploy --stage local -r ap-northeast-1
 
 local-deploy-func: clean build
-	sls deploy --function registerFcmTokens --stage local --region us-east-1
+	sls deploy --function registerFcmTokens --stage local --region ap-northeast-1
 
 local-destroy:
 	docker rm -f $$(docker ps -aqf "name=register-fcm-token_localstack_1")

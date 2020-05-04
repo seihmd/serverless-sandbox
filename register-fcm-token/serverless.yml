@@ -9,15 +9,9 @@ provider:
   name: aws
   runtime: go1.x
   stage: ${opt:stage, 'dev'}
-  region: us-east-1
+  region: ${opt:region, 'ap-northeast-1'}
   deploymentBucket:
     name: ${self:service}-${opt:stage}-deployment-bucket
-
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:CreatePlatformEndpoint"
-#      Resource: ${ssm:/fcm/${self:provider.stage}/sns/arn}
 
 custom:
   localstack:
@@ -34,11 +28,9 @@ custom:
       ES: http://localhost:4578
       SNS: http://localhost:4575
       SQS: http://localhost:4576
+      SSM: http://localhost:4583
       Lambda: http://localhost:4574
       Kinesis: http://localhost:4568
-  sns_arn:
-    local: arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns
-#    default: ${ssm:/fcm/${self:provider.stage}/sns/arn}
 
 package:
   exclude:
@@ -49,18 +41,16 @@ package:
 functions:
   registerFcmTokens:
     handler: bin/registerFcmTokens
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - sns:CreatePlatformEndpoint
-        Resource: 'arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns'
     events:
       - http:
           path: fcm-tokens
           method: POST
     environment:
-      ENV_SNS_ARN: arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns
+      ENV_STAGE: ${self:provider.stage}
+      ENV_SNS_ARN: arn:aws:sns:ap-northeast-1:000000000000:app/GCM/fcm_sns
       ENV_DYNAMO_TABLE: FcmTable #${ssm:/fcm/${self:provider.stage}/dynamodb/table/name}
+#      ENV_SNS_ARN: ${self:custom.sns_arn.${self:provider.stage}, ${ssm:/fcm/${self:provider.stage}/sns/arn} }
+#      ENV_DYNAMO_TABLE: ${self:custom.dynamodb_table_name.${self:provider.stage}, ${ssm:/fcm/${self:provider.stage}/dynamodb/table/name} }
 # you can add CloudFormation resource templates here
 #resources:
 #  Resources:
