@@ -10,9 +10,22 @@ provider:
   runtime: go1.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'ap-northeast-1'}
-  deploymentBucket:
-    name: ${self:service}-${opt:stage}-deployment-bucket
-
+  profile: default
+  deploymentBucket: ${opt:bucket}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ssm:GetParameter
+      Resource: { 'Fn::Join': [':', ['arn:aws:ssm', { Ref: 'AWS::Region' }, { Ref: 'AWS::AccountId' }, 'parameter/fcm/${self:provider.stage}/*']] }
+    - Effect: Allow
+      Action:
+        - sns:CreatePlatformEndpoint
+      Resource: ${ssm:/fcm/${self:provider.stage}/sns/arn}
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: ${ssm:/fcm/${self:provider.stage}/dynamodb/table/arn}
 custom:
   localstack:
     debug: true
@@ -31,6 +44,10 @@ custom:
       SSM: http://localhost:4583
       Lambda: http://localhost:4574
       Kinesis: http://localhost:4568
+  sns_arn:
+    local: arn:aws:sns:ap-northeast-1:000000000000:app/GCM/fcm_sns
+  dynamodb_table_name:
+    local: FcmTable
 
 package:
   exclude:
@@ -41,24 +58,10 @@ package:
 functions:
   registerFcmTokens:
     handler: bin/registerFcmTokens
+    #    iamRoleStatementsInherit: true
     events:
       - http:
           path: fcm-tokens
           method: POST
     environment:
       ENV_STAGE: ${self:provider.stage}
-      ENV_SNS_ARN: arn:aws:sns:ap-northeast-1:000000000000:app/GCM/fcm_sns
-      ENV_DYNAMO_TABLE: FcmTable #${ssm:/fcm/${self:provider.stage}/dynamodb/table/name}
-#      ENV_SNS_ARN: ${self:custom.sns_arn.${self:provider.stage}, ${ssm:/fcm/${self:provider.stage}/sns/arn} }
-#      ENV_DYNAMO_TABLE: ${self:custom.dynamodb_table_name.${self:provider.stage}, ${ssm:/fcm/${self:provider.stage}/dynamodb/table/name} }
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"

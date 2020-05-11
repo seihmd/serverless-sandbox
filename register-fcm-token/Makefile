@@ -7,8 +7,8 @@ build: gomodgen
 clean:
 	rm -rf ./bin ./vendor Gopkg.lock
 
-deploy: clean build
-	sls deploy
+deploy-dev: clean build
+	sls deploy --stage dev -v
 
 gomodgen:
 	chmod u+x gomod.sh
@@ -38,7 +38,7 @@ local-dynamodb-create-table:
 local-ssm-put-parameter:
 	awslocal ssm put-parameter \
 		--name /fcm/local/sns/arn \
-		--value arn:aws:sns:ap-northeast-1:000000000000:app/GCM/fcm_sns \
+		--value arn:aws:sns:us-east-1:000000000000:app/GCM/fcm_sns \
 		--type String \
 	&& awslocal ssm put-parameter \
 		--name /fcm/local/dynamodb/table/name \
@@ -46,10 +46,17 @@ local-ssm-put-parameter:
 		--type String
 
 local-deploy: clean build
-	sls deploy --stage local -r ap-northeast-1
+	sls deploy \
+	  --stage local \
+	  --region us-east-1 \
+	  --bucket=register-fcm-token-service-local-bucket
 
 local-deploy-func: clean build
-	sls deploy --function registerFcmTokens --stage local --region ap-northeast-1
+	sls deploy \
+	  --function registerFcmTokens \
+	  --stage local \
+	  --region us-east-1 \
+	  --bucket=register-fcm-token-service-local-bucket
 
 local-destroy:
 	docker rm -f $$(docker ps -aqf "name=register-fcm-token_localstack_1")

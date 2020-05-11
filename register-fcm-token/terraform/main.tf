@@ -50,6 +50,12 @@ resource "aws_ssm_parameter" "fcm_dynamodb_table_name" {
   value = aws_dynamodb_table.fcm_dynamo_table.name
 }
 
+resource "aws_ssm_parameter" "fcm_dynamodb_table_arn" {
+  name  = "/fcm/${var.env}/dynamodb/table/arn"
+  type  = "String"
+  value = aws_dynamodb_table.fcm_dynamo_table.arn
+}
+
 resource "aws_ssm_parameter" "fcm_sns_arn" {
   name  = "/fcm/${var.env}/sns/arn"
   type  = "String"

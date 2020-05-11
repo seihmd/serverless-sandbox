@@ -3,48 +3,66 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/sns"
+	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/guregu/dynamo"
+	"log"
 	"os"
 )
 
 var (
 	snsArn    string
 	tableName string
+	ssmClient *ssm.SSM
 	snsClient *sns.SNS
 	dbClient  *dynamo.DB
 )
 
 func init() {
-	snsArn = os.Getenv("ENV_SNS_ARN")
-	tableName = os.Getenv("ENV_DYNAMO_TABLE")
+	stage := os.Getenv("ENV_STAGE")
 	hostName := os.Getenv("LOCALSTACK_HOSTNAME")
 
-	sess, err := session.NewSession(&aws.Config{
-		Endpoint: aws.String("http://" + hostName + ":4575"),
-		//Region:   aws.String(endpoints.UsEast1RegionID),
-	})
+	sessOpt := session.Options{}
+	if stage == "local" && hostName != "" {
+		sessOpt.Config = aws.Config{
+			Endpoint: aws.String("http://" + hostName + ":4566"),
+		}
+	}
 
-	if err != nil {
-		panic(err)
+	sess := session.Must(session.NewSessionWithOptions(sessOpt))
+
+	ssmClient = ssm.New(sess)
+
+	var err error
+	if snsArn, err = getSSM(fmt.Sprintf("/fcm/%s/sns/arn", stage)); err != nil {
+		log.Fatal(err)
+	}
+
+	if tableName, err = getSSM(fmt.Sprintf("/fcm/%s/dynamodb/table/name", stage)); err != nil {
+		log.Fatal(err)
 	}
 
 	snsClient = sns.New(sess)
-
-	dbClient = dynamo.New(sess, &aws.Config{
-		Endpoint: aws.String("http://" + hostName + ":4569"),
-		Region:   aws.String(endpoints.UsEast1RegionID),
-	})
+	dbClient = dynamo.New(sess)
 }
 
-// Response is of type APIGatewayProxyResponse since we're leveraging the
-// AWS Lambda Proxy Request functionality (default behavior)
-//
+func getSSM(name string) (string, error) {
+	o, err := ssmClient.GetParameter(
+		&ssm.GetParameterInput{
+			Name: aws.String(name),
+		},
+	)
+	if err != nil {
+		return "", err
+	}
+	return *o.Parameter.Value, nil
+}
+
 // https://serverless.com/framework/docs/providers/aws/events/apigateway/#lambda-proxy-integration
 type Response events.APIGatewayProxyResponse
 
