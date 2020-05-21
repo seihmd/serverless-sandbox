@@ -1,9 +1,5 @@
-# setup
+# コマンドメモ
 
-```bash
-mkdir docker
-cp -r ../laradock/nginx ./docker/nginx
-cp -r ../laradock/php-fpm ./docker/php-fpm
-cp ../laradock/docker-compose.yml docker-compose.yml
-touch ./docker/php-fpm/startup.sh
-```
+docker-compose up -d --build
+docker exec -it symfony-fargate_php-fpm_1 /bin/sh
+

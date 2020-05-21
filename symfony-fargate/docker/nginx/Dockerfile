@@ -1,6 +1,6 @@
-FROM nginx
+FROM nginx:1.18-alpine
 
-ADD ./docker/nginx/site.conf /etc/nginx/conf.d/default.conf
+ADD ./docker/nginx/default.conf /etc/nginx/conf.d/
 
-RUN mkdir -p /app/public
-ADD ./public/ /app/public/
+#RUN mkdir -p /src/public
+#ADD ./public/ /src/public/
