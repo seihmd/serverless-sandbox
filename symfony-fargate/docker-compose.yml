@@ -7,19 +7,19 @@ services:
     ports:
       - 8082:80
     volumes:
-      - ./src:/var/www/src/
+      - ./app:/var/www/src/
     depends_on:
-      - php-fpm
+      - "php"
     networks:
       - symfony
-  php-fpm:
+  php:
     build:
       context: .
       dockerfile: ./docker/php-fpm/Dockerfile
     environment:
       APP_ENV: dev
     volumes:
-      - ./src:/var/www/src/
+      - ./app:/var/www/src/
     networks:
       - symfony
 
