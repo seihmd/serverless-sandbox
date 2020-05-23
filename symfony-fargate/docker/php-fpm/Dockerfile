@@ -28,7 +28,7 @@ RUN set -xe; \
 COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer global require hirak/prestissimo
 
-WORKDIR /var/www/src
+WORKDIR /var/www/app
 
 CMD composer install; php-fpm
 EXPOSE 9000
