@@ -19,7 +19,7 @@ build-nginx:
 build-php:
 	docker build ./app -t symfony-fargate-php -f ./app/Dockerfile && \
 	docker tag symfony-fargate-php:latest $(IAM_ID).dkr.ecr.ap-northeast-1.amazonaws.com/symfony-fargate-php:latest && \
-    docker push $(IAM_ID).dkr.ecr.ap-northeast-1.amazonaws.com/symfony-fargate-php:latest
+	docker push $(IAM_ID).dkr.ecr.ap-northeast-1.amazonaws.com/symfony-fargate-php:latest
 
 .PHONY: compose-dev
 compose-dev:
