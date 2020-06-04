@@ -1,0 +1,39 @@
+version: '3'
+services:
+  nginx:
+    image: ${IAM_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/symfony-fargate-nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - app-volume:/var/www/app/
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ap-northeast-1
+        awslogs-group: symfony-fargate-dev
+    networks:
+      - symfony
+    links:
+      - php
+
+  php:
+    image: ${IAM_ID}.dkr.ecr.ap-northeast-1.amazonaws.com/symfony-fargate-php:latest
+    ports:
+      - 8081:8081
+    volumes:
+      - app-volume:/var/www/app/
+    logging:
+      driver: awslogs
+      options:
+        awslogs-region: ap-northeast-1
+        awslogs-group: symfony-fargate-dev
+    env_file:
+      - ./app/.env
+    networks:
+      - symfony
+
+networks:
+  symfony:
+
+volumes:
+  app-volume:

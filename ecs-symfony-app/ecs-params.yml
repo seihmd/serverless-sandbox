@@ -1,0 +1,84 @@
+# https://docs.aws.amazon.com/ja_jp/AmazonECS/latest/developerguide/cmd-ecs-cli-compose-ecsparams.html
+version: 1
+task_definition:
+  ecs_network_mode: bridge
+  #  task_role_arn: IAMロールのarn
+  #  task_execution_role: タスク実行ロールのarn
+  task_size:
+    cpu_limit: 256
+    mem_limit: 512
+  #  pid_mode: string
+  #  ipc_mode: string
+  services:
+    php:
+      essential: false
+      #      repository_credentials:
+      #        credentials_parameter: string
+      #      cpu_shares: integer
+      mem_limit: 300M
+      #      mem_reservation: string
+      #      gpu: string
+      #      init_process_enabled: boolean
+      #      healthcheck:
+      #        test: ["CMD", "curl -f http://localhost"]
+      #        interval: string
+      #        timeout: string
+      #        retries: integer
+      #        start_period: string
+      #      firelens_configuration:
+      #        type: string
+      #        options:
+      #          enable-ecs-log-metadata: boolean
+      #      secrets:
+      #        - value_from: string
+      #          name: string
+    nginx:
+      essential: true
+      mem_limit: 300M
+#  docker_volumes:
+#    - name: string
+#      scope: string
+#      autoprovision:
+#      driver: string
+#      driver_opts: boolean
+#        string: string
+#      labels:
+#        string: string
+#  placement_constraints:
+#    - type: string
+#      expression: string
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      #      subnets:
+      #        - subnet_id1
+      #        - subnet_id2
+      security_groups:
+        - sg-04a0ef52987872b33
+          #      assign_public_ip: ENABLED
+          #  task_placement:
+          #    strategy:
+          #      - type: string
+          #        field: string
+          #    constraints:
+          #      - type: string
+          #        expression: string
+          #  service_discovery:
+          #    container_name: string
+          #    container_port: integer
+          #    private_dns_namespace:
+          #      vpc: string
+          #      id: string
+          #      name: string
+          #      description: string
+          #    public_dns_namespace:
+          #      id: string
+          #      name: string
+          #    service_discovery_service:
+          #      name: string
+          #      description: string
+          #      dns_config:
+          #        type: string
+        #        ttl: integer
+        #      healthcheck_custom_config:
+#        failure_threshold: integer
