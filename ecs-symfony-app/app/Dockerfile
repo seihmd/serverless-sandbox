@@ -29,7 +29,11 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 RUN composer global require hirak/prestissimo
 
 WORKDIR /var/www/app
+CMD composer install; php-fpm
+
 COPY . /var/www/app/
 
-CMD composer install; php-fpm
+RUN composer dump-autoload --no-scripts --no-dev --optimize
+
+
 EXPOSE 9000
