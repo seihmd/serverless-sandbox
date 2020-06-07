@@ -1,0 +1,49 @@
+plugins:
+  - serverless-offline
+
+service: fcm-delivery-platform
+
+frameworkVersion: '>=1.28.0 <2.0.0'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'ap-northeast-1'}
+  profile: default
+  deploymentBucket: ${opt:bucket}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "sqs:SendMessage"
+        - "sqs:GetQueueUrl"
+      Resource:
+        Fn::GetAtt:
+          - TargetQueue
+          - Arn
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  app:
+    handler: bin/app
+    reservedConcurrency: 1
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - TargetQueue
+              - Arn
+          batchSize: 1
+          maximumRetryAttempts: 2
+
+resources:
+  Resources:
+    TargetQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "FcmDeliveryPlatformTargetQueue-${self:provider.stage}"

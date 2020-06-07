@@ -1,7 +1,5 @@
-node_modules
-*.tfstate*
+# Serverless directories
 .serverless
-.terraform
 
 # golang output binary directory
 bin
@@ -21,5 +19,3 @@ vendor
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-**/.idea/*
-
