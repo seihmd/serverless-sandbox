@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"google.golang.org/api/option"
 	"log"
+	"os"
 )
 
 type Platform int
@@ -31,10 +32,14 @@ type deliveryItem struct {
 type Response events.APIGatewayProxyResponse
 
 func init() {
-	ctx := context.Background()
-	sa := option.WithCredentialsFile("./firebase_service_account.json")
+	cred := os.Getenv("FIREBASE_CREDENTIAL")
+
+	log.Println(cred)
+
+	sa := option.WithCredentialsJSON([]byte(cred))
 	log.Println(sa)
 
+	ctx := context.Background()
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		log.Fatalln(err)
@@ -49,6 +54,7 @@ func init() {
 }
 
 func Handler(ctx context.Context, e events.SQSEvent) (Response, error) {
+	log.Println("🌴")
 	var messages []*messaging.Message
 	for _, message := range e.Records {
 		log.Printf("The message %s for event source %s = %s \n", message.MessageId, message.EventSource, message.Body)
@@ -87,8 +93,8 @@ func createMessage(body string) *messaging.Message {
 	}
 
 	n := messaging.Notification{
-		Title:    item.Title,
-		Body:     item.Body,
+		Title: item.Title,
+		Body:  item.Body,
 	}
 
 	m := messaging.Message{

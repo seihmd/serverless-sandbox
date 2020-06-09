@@ -1,9 +1,9 @@
-plugins:
-  - serverless-offline
-
-service: fcm-delivery-platform
+service: fcm-delivery
 
 frameworkVersion: '>=1.28.0 <2.0.0'
+
+plugins:
+  - serverless-localstack
 
 provider:
   name: aws
@@ -28,10 +28,26 @@ package:
   include:
     - ./bin/**
 
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+    host: http://localhost
+    autostart: true
+    endpoints:
+      SNS: http://localhost:4575
+      SQS: http://localhost:4576
+      SSM: http://localhost:4583
+      Lambda: http://localhost:4574
+  firebase_service_account_json: ${file(./app/firebase_service_account.json)
+
 functions:
   app:
     handler: bin/app
     reservedConcurrency: 1
+    environment:
+      FIREBASE_CREDENTIAL: ${self:custom.firebase_service_account_json}
     events:
       - sqs:
           arn:
@@ -39,7 +55,6 @@ functions:
               - TargetQueue
               - Arn
           batchSize: 1
-          maximumRetryAttempts: 2
 
 resources:
   Resources:
