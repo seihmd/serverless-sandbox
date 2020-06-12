@@ -23,4 +23,3 @@ vendor
 *.out
 **/.idea/*
 
-fcm-delivery-platform/app/firebase_service_account.json

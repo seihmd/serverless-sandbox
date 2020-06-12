@@ -29,10 +29,13 @@ localstack:
 local-s3-mb:
 	awslocal s3 mb s3://fcm-delivery-service-local-bucket
 
+local-sqs-createQueue:
+	awslocal sqs create-queue --queue-name=FcmDeliveryPlatformTargetQueue-local
+
 local-deploy: clean build
 	sls deploy \
-	  --stage local \
-	  --region us-east-1 \
+	  --stage=local \
+	  --region=us-east-1 \
 	  --bucket=fcm-delivery-service-local-bucket
 
 local-deploy-func: clean build
@@ -46,4 +49,4 @@ local-destroy:
 	docker rm -f $$(docker ps -aqf "name=fcm-delivery-platform_localstack_1")
 
 local-invoke:
-	awslocal lambda invoke --function-name fcm-delivery-local-app output.txt
+	awslocal sqs send-message --queue-url=http://localhost:4576/queue/FcmDeliveryPlatformTargetQueue-local --message-body="{}"

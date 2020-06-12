@@ -9,7 +9,7 @@ provider:
   name: aws
   runtime: go1.x
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'ap-northeast-1'}
+  region: ${opt:region, 'us-east-1'}
   profile: default
   deploymentBucket: ${opt:bucket}
   iamRoleStatements:
