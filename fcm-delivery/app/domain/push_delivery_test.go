@@ -35,7 +35,7 @@ func TestPushDeliveryService_Handle_errorOccurred_recordErrorOtherwiseRecordComp
 			messageSender := NewMockMessageSender(ctrl)
 			resultRecorder := NewMockResultRecorder(ctrl)
 
-			s := PushDeliveryService{
+			s := PushDelivery{
 				messageSender:  messageSender,
 				resultRecorder: resultRecorder,
 			}

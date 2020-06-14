@@ -35,7 +35,7 @@ func (m Message) IsWeb() bool {
 }
 
 type MessageSender interface {
-	Send(context.Context, []Message) (*messaging.BatchResponse, error)
+	Send(context.Context, []*Message) (*messaging.BatchResponse, error)
 }
 
 type ResultRecorder interface {
@@ -43,28 +43,29 @@ type ResultRecorder interface {
 	Completed(*messaging.BatchResponse)
 }
 
-type PushDeliveryService struct {
+type PushDelivery struct {
 	messageSender  MessageSender
 	resultRecorder ResultRecorder
 }
 
-func NewPushDeliveryService(ms MessageSender, rr ResultRecorder) *PushDeliveryService {
-	return &PushDeliveryService{
+func NewPushDelivery(ms MessageSender, rr ResultRecorder) *PushDelivery {
+	return &PushDelivery{
 		messageSender:  ms,
 		resultRecorder: rr,
 	}
 }
 
-func (s *PushDeliveryService) Handle(ctx context.Context, m []Message) {
+func (s *PushDelivery) Handle(ctx context.Context, m []*Message) error {
 	batchResponse, err := s.messageSender.Send(ctx, m)
 
 	s.logResult(batchResponse, err)
+
+	return err
 }
 
-func (s *PushDeliveryService) logResult(b *messaging.BatchResponse, err error) {
+func (s *PushDelivery) logResult(b *messaging.BatchResponse, err error) {
 	if err != nil {
 		s.resultRecorder.ErrorOccurred(err)
-		return
 	}
 
 	s.resultRecorder.Completed(b)
