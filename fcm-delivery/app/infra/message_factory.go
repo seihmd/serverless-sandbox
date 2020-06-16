@@ -7,7 +7,7 @@ import (
 
 // see https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
 
-func buildMessage(m domain.Message) *messaging.Message {
+func buildMessage(m *domain.Message) *messaging.Message {
 	if m.Platform == domain.Web {
 		return buildWebPushMessage(m)
 	} else if m.Platform == domain.IOS {
@@ -19,7 +19,7 @@ func buildMessage(m domain.Message) *messaging.Message {
 	return nil
 }
 
-func buildWebPushMessage(m domain.Message) *messaging.Message {
+func buildWebPushMessage(m *domain.Message) *messaging.Message {
 	if m.Platform != domain.Web {
 		return nil
 	}
@@ -39,7 +39,7 @@ func buildWebPushMessage(m domain.Message) *messaging.Message {
 	}
 }
 
-func buildIOSPushMessage(m domain.Message) *messaging.Message {
+func buildIOSPushMessage(m *domain.Message) *messaging.Message {
 	if m.Platform != domain.IOS {
 		return nil
 	}
@@ -63,7 +63,7 @@ func buildIOSPushMessage(m domain.Message) *messaging.Message {
 	}
 }
 
-func buildAndroidPushMessage(m domain.Message) *messaging.Message {
+func buildAndroidPushMessage(m *domain.Message) *messaging.Message {
 	if m.Platform != domain.Android {
 		return nil
 	}

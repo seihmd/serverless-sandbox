@@ -66,6 +66,7 @@ func (s *PushDelivery) Handle(ctx context.Context, m []*Message) error {
 func (s *PushDelivery) logResult(b *messaging.BatchResponse, err error) {
 	if err != nil {
 		s.resultRecorder.ErrorOccurred(err)
+		return
 	}
 
 	s.resultRecorder.Completed(b)

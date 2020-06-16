@@ -9,7 +9,7 @@ import (
 
 func Test_buildMessage(t *testing.T) {
 	type args struct {
-		m domain.Message
+		m *domain.Message
 	}
 	tests := []struct {
 		name string
@@ -19,7 +19,7 @@ func Test_buildMessage(t *testing.T) {
 		{
 			"web push message",
 			args{
-				domain.Message{
+				&domain.Message{
 					Title:          "タイトル1",
 					Body:           "本文1",
 					ImageURL:       "https://example.com",
@@ -45,7 +45,7 @@ func Test_buildMessage(t *testing.T) {
 		{
 			"ios push message",
 			args{
-				domain.Message{
+				&domain.Message{
 					Title:          "タイトル2",
 					Body:           "本文2",
 					ImageURL:       "https://example.com",
@@ -75,7 +75,7 @@ func Test_buildMessage(t *testing.T) {
 		{
 			"android push message",
 			args{
-				domain.Message{
+				&domain.Message{
 					Title:          "タイトル3",
 					Body:           "本文3",
 					ImageURL:       "https://example.com",

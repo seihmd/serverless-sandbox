@@ -42,20 +42,20 @@ func TestPushDeliveryService_Handle_errorOccurred_recordErrorOtherwiseRecordComp
 
 			messageSender.
 				EXPECT().
-				send(gomock.Any(), gomock.Any()).
+				Send(gomock.Any(), gomock.Any()).
 				Return(nil, tt.err)
 
 			resultRecorder.
 				EXPECT().
-				errorOccurred(tt.err).
+				ErrorOccurred(tt.err).
 				Times(tt.expect)
 
 			resultRecorder.
 				EXPECT().
-				completed(tt.err).
+				Completed(tt.err).
 				Times(1 - tt.expect)
 
-			s.Handle(context.Background(), []Message{})
+			s.Handle(context.Background(), []*Message{})
 		})
 	}
 }

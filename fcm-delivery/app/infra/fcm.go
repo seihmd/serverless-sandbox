@@ -12,7 +12,7 @@ type FCM struct {
 	client *messaging.Client
 }
 
-func (fcm FCM) Send(ctx context.Context, messages []domain.Message) (*messaging.BatchResponse, error) {
+func (fcm FCM) Send(ctx context.Context, messages []*domain.Message) (*messaging.BatchResponse, error) {
 	var fcmMessages []*messaging.Message
 
 	for _, m := range messages {
